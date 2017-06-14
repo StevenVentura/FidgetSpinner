@@ -45,45 +45,40 @@ end
 
 lagLess = 0;
 FidgetSpinnerTimeDelayThing = 0.50;
+pleaseIncrement = 0;
 function FidgetSpinnerOnUpdate(self, elapsed)
 lagLess = lagLess + elapsed;
 if (lagLess < FidgetSpinnerTimeDelayThing) then  return end
 lagLess = 0;
 --do stuff here
-
-
+pleaseIncrement = pleaseIncrement + 0.25;
+FidgetSpinnerImageTexture:SetRotation(pleaseIncrement,0.5,0.5);
 end--end function FidgetSpinnerOnUpdate
 
 
 
 
-
+fidgetFilePath = 'Interface/AddOns/FidgetSpinner/images/';
 
 --this is called after the variables are loaded
 function FidgetSpinnerInit()
 --TESTING CODE -- TEST
 WorldFrameMaxWidth = UIParent:GetWidth();--WorldFrame:GetWidth();
 WorldFrameMaxHeight = UIParent:GetHeight();--WorldFrame:GetHeight();
-local numrows, numcols = 5,5; 
-local f = CreateFrame("Frame","FidgetSpinnerTestFrame",UIParent);
-local width, height = WorldFrameMaxWidth/numrows, WorldFrameMaxHeight/numcols;
-f:SetSize(width,width);
-f:SetPoint("TOPLEFT",300,-300);
---local model = CreateFrame("PlayerModel","stevenoob" .. (r*10 + c),f);
-local model = CreateFrame("DressUpModel","mst",f);
-f.portrait = model;
-model:SetUnit("player");
-model:SetTexture('Interface/AddOns/FidgetSpinner/images/purpledragon.tga')
---7 is gnome, 0 is male
---[[model:SetCustomRace(7,0);
-model:UndressSlot(1)--helmet
-model:SetAnimation(225)]]
 
+local fs = CreateFrame("FRAME","FidgetSpinnerImageFrame",UIParent);
+fs:SetSize(300,300);
+fs:SetPoint("TOPLEFT",0,-100);
+FidgetSpinnerImageTexture = fs:CreateTexture();
+FidgetSpinnerImageTexture:SetTexture(fidgetFilePath .. 'black.tga');
+FidgetSpinnerImageTexture:SetAllPoints()
+FidgetSpinnerImageFrame:CreateFontString("FidgetFontString","HIGH","GameFontNormal");
+FidgetFontString:SetTextColor(1,0.643,0.169,1);
+FidgetFontString:SetShadowColor(0,0,0,1);
+FidgetFontString:SetPoint("TOPLEFT");
+FidgetFontString:SetText("Time To Spin");
+FidgetFontString:Show();
 
---model:SetCreature(822);--bear
-
---model:SetAnimation(126);--https://us.battle.net/forums/en/wow/topic/8569600188
-model:SetAllPoints();
-f:Show();
+fs:Show()
 
 end--end function FidgetSpinnerInit
