@@ -1,0 +1,9 @@
+## Interface: 70100
+
+## Title: |cff88ff88Spin the fFidget
+
+## Notes: |cff22ffffSample Text
+## SavedVariables: FidgetSpinnerExample
+
+FidgetSpinner.xml
+FidgetSpinner.lua
