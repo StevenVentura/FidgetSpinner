@@ -13,6 +13,12 @@ FidgetSpinner.speed = 0;
 FidgetSpinner.acceleration = -0.0005 * 2.5 * 2;
 FidgetSpinner.angle = 0;
 FidgetSpinner.plusColor = 0;
+FidgetSpinner:SetSize(300,300);
+FidgetSpinner:SetPoint("TOPLEFT",0,-100);
+
+CreateFrame("FRAME","FidgetSpinnerArrowThing",UIParent);
+
+FidgetSpinnerTempShow = {};
 
 --FidgetSpinner:SetScript("OnEvent",function(self,event,...) self[event](self,event,...);end)
 FidgetSpinner:SetScript("OnUpdate", function(self, elapsed) FidgetSpinnerOnUpdate(self, elapsed) end)
@@ -46,7 +52,18 @@ function tablelength(T)
   return count
 end
 
+function HandleTempFidgetFrames(elapsed)
+for i, _ in pairs(FidgetSpinnerTempShow) do
+local x = FidgetSpinnerTempShow[i];
+if (x.showCounter < x.showDurationMax) then
+x.showCounter = x.showCounter + elapsed;
+x:Show();
+else
+x:Hide();
+end--end if
 
+end--end for
+end--end function HandleTempFidgetFrames
 
 lagLess = 0;
 FidgetSpinnerTimeDelayThing = 0.10;
@@ -54,6 +71,7 @@ function FidgetSpinnerOnUpdate(self, elapsed)
 lagLess = lagLess + elapsed;
 if (lagLess < FidgetSpinnerTimeDelayThing) then  return end
 lagLess = 0;
+HandleTempFidgetFrames(elapsed);
 --do stuff here
 if ( not(FidgetSpinner.speed == 0)) then 
 FidgetSpinner.timeSpun = FidgetSpinner.timeSpun + FidgetSpinnerTimeDelayThing /2 ;
@@ -73,6 +91,7 @@ if (currentTime - FidgetSpinner.timeLastClick > captho) then
 FidgetSpinner.plusColor = 0;
 end
 FidgetSpinnerIntensityColorObj:SetColorTexture(FidgetSpinner.plusColor,0.25*FidgetSpinner.plusColor + 0.25,0);
+FidgetSpinnerIntensityColor:SetSize(FidgetSpinner.plusColor*97+3,25);
 end
 
 end--end function FidgetSpinnerOnUpdate
@@ -130,7 +149,7 @@ local xplease = FidgetSpinner.plusColorTemp - 0.45;
 FidgetSpinner.plusColor = xplease*2.857142857142857;
 end
 
-print(FidgetSpinner.plusColor);
+
 --now scale it 0.45 to 0.80
 
 
@@ -143,6 +162,19 @@ FidgetSpinner.speed = FidgetSpinner.speed + plus;
 FidgetSpinner.timeLastClick = currentTime;
 end--end function
 
+function FidgetSpinner_MINIMIZE()
+FidgetSpinnerImageFrame:Hide();
+FidgetSpinnerMaximizeButton:Show();
+FidgetSpinnerArrowThing.showCounter = 0;
+end--end function FidgetSpinner_MINIMIZE
+
+function FidgetSpinner_MAXIMIZE()
+FidgetSpinnerImageFrame:Show();
+FidgetSpinnerMaximizeButton:Hide();
+end--end function FidgetSpinner_MINIMIZE
+
+
+
 
 fidgetFilePath = 'Interface/AddOns/FidgetSpinner/images/';
 
@@ -153,9 +185,9 @@ function FidgetSpinnerInit()
 WorldFrameMaxWidth = UIParent:GetWidth();--WorldFrame:GetWidth();
 WorldFrameMaxHeight = UIParent:GetHeight();--WorldFrame:GetHeight();
 
-local fs = CreateFrame("FRAME","FidgetSpinnerImageFrame",UIParent);
+local fs = CreateFrame("FRAME","FidgetSpinnerImageFrame",FidgetSpinner);
 fs:SetSize(300,300);
-fs:SetPoint("TOPLEFT",0,-100);
+fs:SetAllPoints();
 FidgetSpinnerImageTexture = fs:CreateTexture();
 FidgetSpinnerImageTexture:SetTexture(fidgetFilePath .. 'black.tga');
 FidgetSpinnerImageTexture:SetAllPoints()
@@ -173,19 +205,57 @@ FidgetFontString2:SetText("Time Spun:");
 FidgetFontString2:Show();
 CreateFrame("Button", "FidgetSpinnerSpinButton", FidgetSpinnerImageFrame, "UIPanelButtonTemplate");
 FidgetSpinnerSpinButton:SetSize(75,50);
-FidgetSpinnerSpinButton:SetPoint("TOPLEFT",0,-200)
+FidgetSpinnerSpinButton:SetPoint("TOPLEFT",0,-250)
 FidgetSpinnerSpinButton:SetScript("OnClick",FidgetSpinner_SPINBUTTONPRESSED);
 FidgetSpinnerSpinButton:SetText("SPIN")
 FidgetSpinnerSpinButton:Show()
 
-CreateFrame("FRAME","FidgetSpinnerIntensityColor",fs);
-FidgetSpinnerIntensityColor:SetSize(200,100);
-FidgetSpinnerIntensityColor:SetPoint("BOTTOMRIGHT");
+CreateFrame("Button", "FidgetSpinnerMinimizeButton", FidgetSpinnerImageFrame, "UIPanelButtonTemplate");
+FidgetSpinnerMinimizeButton:SetSize(24,24);
+FidgetSpinnerMinimizeButton:SetPoint("TOPRIGHT",0,-24);
+FidgetSpinnerMinimizeButton:SetScript("OnClick",FidgetSpinner_MINIMIZE);
+FidgetSpinnerMinimizeButton:SetText("--");
+FidgetSpinnerMinimizeButton:Show();
+
+CreateFrame("Button", "FidgetSpinnerMaximizeButton", PlayerFrame, "UIPanelButtonTemplate");
+FidgetSpinnerMaximizeButton:SetSize(24,24);
+FidgetSpinnerMaximizeButton:SetPoint("TOPRIGHT");
+FidgetSpinnerMaximizeButton:SetScript("OnClick",FidgetSpinner_MAXIMIZE);
+FidgetSpinnerMaximizeButton:SetText("+");
+FidgetSpinnerMaximizeButton:Hide();
+
+--
+FidgetSpinnerArrowThing:SetSize(600,600);
+FidgetSpinnerArrowThing:SetPoint("TOPLEFT",FidgetSpinnerMaximizeButton,"BOTTOMRIGHT");
+
+FidgetSpinnerArrowThingObj = FidgetSpinnerArrowThing:CreateTexture();
+FidgetSpinnerArrowThingObj:SetTexture(fidgetFilePath .. "autismarrow.tga");
+FidgetSpinnerArrowThingObj:SetAlpha(1);
+FidgetSpinnerArrowThingObj:SetAllPoints();
+FidgetSpinnerArrowThing.obj = FidgetSpinnerArrowThingObj;
+FidgetSpinnerArrowThing.showDurationMax = 5.0;
+FidgetSpinnerArrowThing.showCounter = FidgetSpinnerArrowThing.showDurationMax;
+FidgetSpinnerTempShow[FidgetSpinnerArrowThing] = FidgetSpinnerArrowThing;
+FidgetSpinnerArrowThing:Hide();
+
+CreateFrame("FRAME","FidgetSpinnerIntensityBackground",fs);
+FidgetSpinnerIntensityBackground:SetSize(100,25);
+FidgetSpinnerIntensityBackground:SetPoint("LEFT",FidgetSpinnerSpinButton,"RIGHT");
+FidgetSpinnerIntensityBackgroundObj = FidgetSpinnerIntensityBackground:CreateTexture("ARTWORK");
+FidgetSpinnerIntensityBackgroundObj:SetColorTexture(0,0,0);
+FidgetSpinnerIntensityBackgroundObj:SetAlpha(1);
+FidgetSpinnerIntensityBackgroundObj:SetAllPoints();
+FidgetSpinnerIntensityBackground:Show();
+
+CreateFrame("FRAME","FidgetSpinnerIntensityColor",FidgetSpinnerIntensityBackground);
+FidgetSpinnerIntensityColor:SetSize(3,25);
+FidgetSpinnerIntensityColor:SetPoint("LEFT");
 FidgetSpinnerIntensityColorObj = FidgetSpinnerIntensityColor:CreateTexture("ARTWORK");
 FidgetSpinnerIntensityColorObj:SetColorTexture(FidgetSpinner.plusColor,0.25*FidgetSpinner.plusColor + 0.25,0);
 FidgetSpinnerIntensityColorObj:SetAlpha(1);
 FidgetSpinnerIntensityColorObj:SetAllPoints();
 FidgetSpinnerIntensityColor:Show();
+
 fs:Show()
 
 end--end function FidgetSpinnerInit
